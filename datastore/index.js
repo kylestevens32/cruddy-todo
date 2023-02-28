@@ -13,7 +13,7 @@ exports.create = (text, callback) => {
       console.log(err);
       callback(err);
     } else {
-      items[id] = text;
+      //items[id] = text;
 
       var filepath = path.join(exports.dataDir, (id + '.txt'));
       fs.writeFile(filepath, text, (err) => {
@@ -29,7 +29,6 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-
   fs.readdir(exports.dataDir, (err, files) => {
     if (err) {
       callback(err);
@@ -47,12 +46,24 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  var filepath = path.join(exports.dataDir, (id + '.txt'));
+
+  fs.readFile(filepath, (err, text) => {
+    if (err) {
+      callback(err);
+    } else {
+      console.log(text.toString());
+      //callback(null, text.toString());
+      callback(null, { 'id': id, 'text': text.toString()});
+    }
+  });
+
+  // var text = items[id];
+  // if (!text) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback(null, { id, text });
+  // }
 };
 
 exports.update = (id, text, callback) => {
