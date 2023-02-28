@@ -15,6 +15,8 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
+
+
 const readCounter = (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
@@ -38,13 +40,31 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+// readCounter will take a callback that accepts (err and the data from readFile) Ex: callback(null, Number(fileData));
+
+// use writeCounter to update the count to be + 1
+
+exports.getNextUniqueId = (callback) => {
+  readCounter((err, counter) => {
+    if (err) {
+      callback(err);
+    } else {
+      counter++;
+      writeCounter(counter, (err, counterString) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, counterString); //counterString = 00001
+        }
+      });
+    }
+  });
 };
 
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
+
+// __dirname will be file path up until rfp2302-cruddy-todo/datastore/ joined with 'counter.txt'
 
 exports.counterFile = path.join(__dirname, 'counter.txt');
