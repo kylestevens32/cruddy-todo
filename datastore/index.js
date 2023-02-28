@@ -34,13 +34,29 @@ exports.readAll = (callback) => {
       callback(err);
     } else {
       var data = _.map(files, (fileName) => {
-        var id = fileName.slice(0, fileName.length - 4); // remove .txt
-        return {
-          'id': id,
-          'text': id
-        };
+        return new Promise((resolve, reject) => {
+          var id = fileName.slice(0, fileName.length - 4);
+          var filepath = path.join(exports.dataDir, (id + '.txt'));
+          fs.readFile(filepath, 'utf8', (err, content) => {
+            if (err) {
+              reject(err);
+            } else {
+              var todoItem = {
+                'id': id,
+                'text': content
+              };
+              resolve(todoItem);
+            }
+          });
+        });
       });
-      callback(null, data);
+      Promise.all(data)
+        .then((todo) => {
+          callback(null, todo);
+        })
+        .catch((err) => {
+          callback(err);
+        });
     }
   });
 };
@@ -84,16 +100,6 @@ exports.delete = (id, callback) => {
       callback(null);
     }
   });
-
-
-  // var item = items[id];
-  // delete items[id];
-  // if (!item) {
-  //   // report an error if item not found
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback();
-  // }
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
