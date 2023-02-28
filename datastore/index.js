@@ -14,8 +14,16 @@ exports.create = (text, callback) => {
       callback(err);
     } else {
       items[id] = text;
-      callback(null, { id, text });
 
+      var filepath = path.join(exports.dataDir, (id + '.txt'));
+      fs.writeFile(filepath, text, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          console.log('Creating a todo successful');
+          callback(null, { id, text });
+        }
+      });
     }
   });
 };
