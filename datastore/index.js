@@ -3,24 +3,19 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 
-var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId((err, id) => {
+  counter.getNextUniqueId((err, id) => {
     if (err) {
-      console.log(err);
       callback(err);
     } else {
-      //items[id] = text;
-
       var filepath = path.join(exports.dataDir, (id + '.txt'));
       fs.writeFile(filepath, text, (err) => {
         if (err) {
           callback(err);
         } else {
-          console.log('Creating a todo successful');
           callback(null, { id, text });
         }
       });
@@ -35,7 +30,7 @@ exports.readAll = (callback) => {
     } else {
       var data = _.map(files, (fileName) => {
         return new Promise((resolve, reject) => {
-          var id = fileName.slice(0, fileName.length - 4);
+          var id = path.basename(fileName, '.txt');
           var filepath = path.join(exports.dataDir, (id + '.txt'));
           fs.readFile(filepath, 'utf8', (err, content) => {
             if (err) {
